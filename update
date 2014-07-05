@@ -1,0 +1,36 @@
+#!/bin/sh
+
+function notice() {
+  magenta="\033[1;35;40m"
+  clear="\033[0m"
+  echo "#=>$magenta $1$clear"
+}
+
+urlbasename=rust-nightly-x86_64-apple-darwin
+url=http://static.rust-lang.org/dist/"$urlbasename".tar.gz
+today=$(date "+%Y%m%d")
+filename=rust-nightly-$today
+tar=$filename.tar.gz
+
+if [ -f "$tar" ] ; then
+  notice "today's nightly is already downloaded"
+else
+  echo "getting today's nightly"
+  wget -O $tar $url
+fi
+
+if [ -d "$filename" ] ; then
+  notice "today's nightly is already extracted"
+else
+  rm -rf $urlbasename
+  tar -zxvf $tar
+  mv $urlbasename $filename
+fi
+
+if [ -e current ] ; then
+  notice "clearing previous symlink..."
+  rm current
+fi
+
+notice "creating symlink..."
+ln -nfs $filename current
